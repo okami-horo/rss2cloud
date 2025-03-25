@@ -137,38 +137,38 @@ func Get(url string, headers map[string]string) (string, error) {
 	return string(body), nil
 }
 
-func PostJson(url string, body []byte, headers map[string]string) (string, error) {
+func PostJson(url string, body []byte, headers map[string]string) ([]byte, error) {
 	if headers == nil {
 		headers = make(map[string]string)
 	}
 	headers["Content-Type"] = "application/json; charset=UTF-8"
 	res, err := Request("POST", url, bytes.NewBuffer(body), headers)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	body, err = io.ReadAll(res.Body)
 	if err != nil && err != io.EOF {
-		return "", err
+		return nil, err
 	}
-	return string(body), nil
+	return body, nil
 }
 
-func PostForm(url string, data urlPkg.Values, headers map[string]string) (string, error) {
+func PostForm(url string, data urlPkg.Values, headers map[string]string) ([]byte, error) {
 	if headers == nil {
 		headers = make(map[string]string)
 	}
 	headers["Content-Type"] = "application/x-www-form-urlencoded"
 	res, err := Request("POST", url, bytes.NewBufferString(data.Encode()), headers)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil && err != io.EOF {
-		return "", err
+		return nil, err
 	}
-	return string(body), nil
+	return body, nil
 }

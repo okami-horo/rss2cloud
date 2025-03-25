@@ -90,7 +90,7 @@ func TestPostForm(t *testing.T) {
 	if err != nil {
 		t.Error()
 	}
-	t.Log(res)
+	t.Log(string(res))
 }
 
 func TestPostJson(t *testing.T) {
@@ -106,7 +106,7 @@ func TestPostJson(t *testing.T) {
 	if err != nil {
 		t.Error()
 	}
-	t.Log(res)
+	t.Log(string(res))
 }
 
 func TestDownloadFile(t *testing.T) {
