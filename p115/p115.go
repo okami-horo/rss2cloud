@@ -142,7 +142,7 @@ func (ag *Agent) addCloudTasks(magnetItems []rsssite.MagnetItem, config *rsssite
 		log.Printf("[%s] has 0 task\n", config.Name)
 		return
 	}
-	for _, items := range chunkBy(filterdItems, defaultChunkSize) {
+	for i, items := range chunkBy(filterdItems, defaultChunkSize) {
 		urls := make([]string, 0)
 		for _, item := range items {
 			urls = append(urls, item.Magnet)
@@ -154,7 +154,9 @@ func (ag *Agent) addCloudTasks(magnetItems []rsssite.MagnetItem, config *rsssite
 		}
 		log.Printf("[%s] [%s] add %d tasks\n", config.Name, config.Url, len(urls))
 		ag.StoreInstance.SaveMagnetItems(filterdItems)
-		time.Sleep(time.Second * time.Duration(chunkDelay))
+		if i != len(filterdItems)/defaultChunkSize {
+			time.Sleep(time.Second * time.Duration(chunkDelay))
+		}
 	}
 }
 
@@ -188,14 +190,16 @@ func (ag *Agent) ExecuteAllRssTask() {
 }
 
 func (ag *Agent) AddMagnetTask(magnets []string, cid string) {
-	for _, urls := range chunkBy(magnets, defaultChunkSize) {
+	for i, urls := range chunkBy(magnets, defaultChunkSize) {
 		_, err := ag.Agent.OfflineAddUrl(urls, &option.OfflineAddOptions{SaveDirId: cid})
 		if err != nil {
 			log.Printf("Add offline error: %s\n", err)
 			return
 		}
 		log.Printf("[magnet] add %d tasks\n", len(urls))
-		time.Sleep(time.Second * time.Duration(chunkDelay))
+		if i != len(magnets)/defaultChunkSize {
+			time.Sleep(time.Second * time.Duration(chunkDelay))
+		}
 	}
 }
 func (ag *Agent) OfflineClear(num int) (err error) {
