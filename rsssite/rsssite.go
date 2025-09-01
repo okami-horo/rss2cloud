@@ -31,7 +31,7 @@ func getSite(url string) MagnetSite {
 		name = urlObj.Host
 	}
 	switch name {
-	case "mikanani.me", "mikanime.tv":
+	case "mikanani.me", "mikanani.kas.pub", "mikanime.tv":
 		return &Mikanani{}
 	case "nyaa.si", "sukebei.nyaa.si":
 		return &Nyaa{}
