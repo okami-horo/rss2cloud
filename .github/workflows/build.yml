@@ -33,7 +33,7 @@ jobs:
         goarch: [amd64]
     steps:
       - uses: actions/checkout@v4
-      - uses: wangyoucao577/go-release-action@v1
+      - uses: wangyoucao577/go-release-action@v2
         with:
           pre_command: 'export CGO_ENABLED=1'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -83,10 +83,26 @@ jobs:
         goarch: [amd64]
     steps:
       - uses: actions/checkout@v4
-      - uses: wangyoucao577/go-release-action@v1
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
-          pre_command: 'apt-get update && apt-get install --no-install-recommends -y gcc-mingw-w64-x86-64 && export CGO_ENABLED=1 && export CC=x86_64-w64-mingw32-gcc'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: ${{ matrix.goos }}
-          goarch: ${{ matrix.goarch }}
-          release_tag: ${{ github.event.inputs.release_tag }}
+          go-version: '1.23'
+          check-latest: true
+      - name: Install MinGW
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64
+      - name: Build Windows binary
+        run: |
+          export CGO_ENABLED=1
+          export CC=x86_64-w64-mingw32-gcc
+          go build -ldflags "-s -w" -o rss2cloud.exe
+        env:
+          GOOS: windows
+          GOARCH: amd64
+      - name: Upload Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: rss2cloud.exe
+          tag: ${{ github.event.inputs.release_tag }}
+          asset_name: rss2cloud-${{ inputs.release_tag }}-windows-amd64.exe
+          overwrite: true
